@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { render } from "@testing-library/react";
-import { screen } from "@testing-library/dom";
+import { screen, fireEvent } from "@testing-library/dom";
 
 /**
  * Spécifications :
@@ -17,6 +17,7 @@ import { screen } from "@testing-library/dom";
  * - afficher un contenu
  * - TODO: sémantique
  * - TODO: afficher contenu que si le bouton est cliqué
+ * - TODO: fermer contenu si titre re-cliqué
  * - TODO: afficher N titres
  * - TODO: afficher le contenu du titre cliqué
  * - TODO: cacher le contenu du titre non sélectionné
@@ -28,19 +29,30 @@ interface AccordionProps {
 }
 
 function Accordion({ titre, contenu }: AccordionProps) {
+  const [isContenuVisible, setContenuVisible] = useState(false);
+
   return (
     <>
-      <div>{titre}</div>
-      <div>{contenu}</div>
+      <div onClick={() => setContenuVisible(true)}>{titre}</div>
+      <div hidden={!isContenuVisible}>{contenu}</div>
     </>
   );
 }
 
-test("Affiche le titre et le contenu de l'item de l'accordéon", () => {
-  // When
+test("Affiche le titre de l'item de l'accordéon", () => {
   render(<Accordion titre="Le titre" contenu="Le contenu" />);
 
-  // Then
   expect(screen.getByText("Le titre")).toBeVisible();
+});
+
+test("Affiche le contenu de l'item quand le titre est cliqué", () => {
+  render(<Accordion titre="Le titre" contenu="Le contenu" />);
+
+  const titre = screen.getByText("Le titre");
+
+  expect(screen.getByText("Le contenu")).not.toBeVisible();
+
+  fireEvent.click(titre);
+
   expect(screen.getByText("Le contenu")).toBeVisible();
 });
