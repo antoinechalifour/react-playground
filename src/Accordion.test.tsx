@@ -17,7 +17,7 @@ import { screen, fireEvent } from "@testing-library/dom";
  * - afficher un contenu
  * - sémantique titre
  * - TODO: sémantique button
- * - TODO: sémantique contenu
+ * - sémantique contenu
  * - TODO: afficher contenu que si le bouton est cliqué
  * - TODO: fermer contenu si titre re-cliqué
  * - TODO: afficher N titres
@@ -27,7 +27,7 @@ import { screen, fireEvent } from "@testing-library/dom";
 
 interface AccordionProps {
   titre: JSX.Element;
-  contenu: string;
+  contenu: JSX.Element;
 }
 
 function Accordion({ titre, contenu }: AccordionProps) {
@@ -44,12 +44,17 @@ function Accordion({ titre, contenu }: AccordionProps) {
 
 let texteTitre: string;
 let titreElement: JSX.Element;
+let texteContenu: string;
+let contenuElement: JSX.Element;
 
 beforeEach(() => {
   texteTitre = "Le titre";
-  const titleElement = <h2>{texteTitre}</h2>;
+  titreElement = <h2>{texteTitre}</h2>;
 
-  render(<Accordion titre={titleElement} contenu="Le contenu" />);
+  texteContenu = "Le contenu";
+  contenuElement = <p>{texteContenu}</p>;
+
+  render(<Accordion titre={titreElement} contenu={contenuElement} />);
 });
 
 test("Affiche le titre de l'item de l'accordéon", () => {
