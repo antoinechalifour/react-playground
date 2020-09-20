@@ -30,10 +30,11 @@ interface AccordionProps {
 
 function Accordion({ titre, contenu }: AccordionProps) {
   const [isContenuVisible, setContenuVisible] = useState(false);
+  const onTitreClick = () => setContenuVisible(!isContenuVisible);
 
   return (
     <>
-      <div onClick={() => setContenuVisible(true)}>{titre}</div>
+      <button onClick={onTitreClick}>{titre}</button>
       <div hidden={!isContenuVisible}>{contenu}</div>
     </>
   );
@@ -45,14 +46,15 @@ test("Affiche le titre de l'item de l'accordéon", () => {
   expect(screen.getByText("Le titre")).toBeVisible();
 });
 
-test("Affiche le contenu de l'item quand le titre est cliqué", () => {
+test("Affiche le contenu de l'item quand le titre est cliqué, le cache si recliqué", () => {
   render(<Accordion titre="Le titre" contenu="Le contenu" />);
 
   const titre = screen.getByText("Le titre");
+  const contenu = screen.getByText("Le contenu");
 
-  expect(screen.getByText("Le contenu")).not.toBeVisible();
-
+  expect(contenu).not.toBeVisible();
   fireEvent.click(titre);
-
-  expect(screen.getByText("Le contenu")).toBeVisible();
+  expect(contenu).toBeVisible();
+  fireEvent.click(titre);
+  expect(contenu).not.toBeVisible();
 });
