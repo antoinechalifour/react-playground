@@ -14,7 +14,8 @@ import { screen } from "@testing-library/dom";
 /**
  * TODOLIST :
  * - afficher un titre
- * - TODO: afficher un contenu
+ * - afficher un contenu
+ * - TODO: sémantique
  * - TODO: afficher contenu que si le bouton est cliqué
  * - TODO: afficher N titres
  * - TODO: afficher le contenu du titre cliqué
@@ -23,16 +24,23 @@ import { screen } from "@testing-library/dom";
 
 interface AccordionProps {
   titre: string;
+  contenu: string;
 }
 
-function Accordion({ titre }: AccordionProps) {
-  return <>{titre}</>;
+function Accordion({ titre, contenu }: AccordionProps) {
+  return (
+    <>
+      <div>{titre}</div>
+      <div>{contenu}</div>
+    </>
+  );
 }
 
-test("Affiche le titre de l'item de l'accordéon", () => {
+test("Affiche le titre et le contenu de l'item de l'accordéon", () => {
   // When
-  render(<Accordion titre="Le titre" />);
+  render(<Accordion titre="Le titre" contenu="Le contenu" />);
 
   // Then
   expect(screen.getByText("Le titre")).toBeVisible();
+  expect(screen.getByText("Le contenu")).toBeVisible();
 });
