@@ -15,7 +15,9 @@ import { screen, fireEvent } from "@testing-library/dom";
  * TODOLIST :
  * - afficher un titre
  * - afficher un contenu
- * - TODO: sémantique
+ * - sémantique titre
+ * - TODO: sémantique button
+ * - TODO: sémantique contenu
  * - TODO: afficher contenu que si le bouton est cliqué
  * - TODO: fermer contenu si titre re-cliqué
  * - TODO: afficher N titres
@@ -24,7 +26,7 @@ import { screen, fireEvent } from "@testing-library/dom";
  */
 
 interface AccordionProps {
-  titre: string;
+  titre: JSX.Element;
   contenu: string;
 }
 
@@ -40,16 +42,23 @@ function Accordion({ titre, contenu }: AccordionProps) {
   );
 }
 
-test("Affiche le titre de l'item de l'accordéon", () => {
-  render(<Accordion titre="Le titre" contenu="Le contenu" />);
+let texteTitre: string;
+let titreElement: JSX.Element;
 
-  expect(screen.getByText("Le titre")).toBeVisible();
+beforeEach(() => {
+  texteTitre = "Le titre";
+  const titleElement = <h2>{texteTitre}</h2>;
+
+  render(<Accordion titre={titleElement} contenu="Le contenu" />);
+});
+
+test("Affiche le titre de l'item de l'accordéon", () => {
+  expect(screen.getByText(texteTitre)).toBeVisible();
+  expect(screen.getByText(texteTitre).tagName).toBe("H2");
 });
 
 test("Affiche le contenu de l'item quand le titre est cliqué, le cache si recliqué", () => {
-  render(<Accordion titre="Le titre" contenu="Le contenu" />);
-
-  const titre = screen.getByText("Le titre");
+  const titre = screen.getByText(texteTitre);
   const contenu = screen.getByText("Le contenu");
 
   expect(contenu).not.toBeVisible();
