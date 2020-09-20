@@ -16,10 +16,11 @@ import { screen, fireEvent } from "@testing-library/dom";
  * - afficher un titre
  * - afficher un contenu
  * - sémantique titre
- * - TODO: sémantique button
+ * - sémantique button titre
+ * - TODO: sémantique contrôle affichage
  * - sémantique contenu
- * - TODO: afficher contenu que si le bouton est cliqué
- * - TODO: fermer contenu si titre re-cliqué
+ * - afficher contenu que si le bouton est cliqué
+ * - fermer contenu si titre re-cliqué
  * - TODO: afficher N titres
  * - TODO: afficher le contenu du titre cliqué
  * - TODO: cacher le contenu du titre non sélectionné
@@ -33,10 +34,20 @@ interface AccordionProps {
 function Accordion({ titre, contenu }: AccordionProps) {
   const [isContenuVisible, setContenuVisible] = useState(false);
   const onTitreClick = () => setContenuVisible(!isContenuVisible);
+  const onTitreKeyDown = (e: React.KeyboardEvent) => {
+    if (["13", "32"].includes(e.key)) onTitreClick();
+  };
 
   return (
     <>
-      <button onClick={onTitreClick}>{titre}</button>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onTitreClick}
+        onKeyDown={onTitreKeyDown}
+      >
+        {titre}
+      </div>
       <div hidden={!isContenuVisible}>{contenu}</div>
     </>
   );
@@ -58,8 +69,10 @@ beforeEach(() => {
 });
 
 test("Affiche le titre de l'item de l'accordéon", () => {
-  expect(screen.getByText(texteTitre)).toBeVisible();
-  expect(screen.getByText(texteTitre).tagName).toBe("H2");
+  const conteneurTexte = screen.getByText(texteTitre);
+
+  expect(conteneurTexte).toBeVisible();
+  expect(conteneurTexte.tagName).toBe("H2");
 });
 
 test("Affiche le contenu de l'item quand le titre est cliqué, le cache si recliqué", () => {
@@ -70,5 +83,26 @@ test("Affiche le contenu de l'item quand le titre est cliqué, le cache si recli
   fireEvent.click(titre);
   expect(contenu).toBeVisible();
   fireEvent.click(titre);
+  expect(contenu).not.toBeVisible();
+});
+
+test("Le titre est accessible", () => {
+  const conteneurTitre = screen.getByText(texteTitre)!.parentElement!;
+  const contenu = screen.getByText("Le contenu");
+
+  expect(conteneurTitre.tagName).toBe("DIV");
+  expect(conteneurTitre).toHaveAttribute("role", "button");
+  expect(conteneurTitre).toHaveAttribute("tabindex", "0");
+
+  fireEvent.keyDown(conteneurTitre, { key: "13" });
+  expect(contenu).toBeVisible();
+
+  fireEvent.keyDown(conteneurTitre, { key: "13" });
+  expect(contenu).not.toBeVisible();
+
+  fireEvent.keyDown(conteneurTitre, { key: "32" });
+  expect(contenu).toBeVisible();
+
+  fireEvent.keyDown(conteneurTitre, { key: "32" });
   expect(contenu).not.toBeVisible();
 });
