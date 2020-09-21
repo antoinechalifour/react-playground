@@ -17,7 +17,7 @@ import { screen, fireEvent } from "@testing-library/dom";
  * - afficher un contenu
  * - sémantique titre
  * - sémantique button titre
- * - TODO: sémantique contrôle affichage
+ * - sémantique contrôle affichage
  * - sémantique contenu
  * - afficher contenu que si le bouton est cliqué
  * - fermer contenu si titre re-cliqué
@@ -27,11 +27,12 @@ import { screen, fireEvent } from "@testing-library/dom";
  */
 
 interface AccordionProps {
+  id: string;
   titre: JSX.Element;
   contenu: JSX.Element;
 }
 
-function Accordion({ titre, contenu }: AccordionProps) {
+function Accordion({ id, titre, contenu }: AccordionProps) {
   const [isContenuVisible, setContenuVisible] = useState(false);
   const onTitreClick = () => setContenuVisible(!isContenuVisible);
   const onTitreKeyDown = (e: React.KeyboardEvent) => {
@@ -45,27 +46,34 @@ function Accordion({ titre, contenu }: AccordionProps) {
         tabIndex={0}
         onClick={onTitreClick}
         onKeyDown={onTitreKeyDown}
+        aria-expanded={isContenuVisible}
+        aria-controls={id}
       >
         {titre}
       </div>
-      <div hidden={!isContenuVisible}>{contenu}</div>
+      <div id={id} hidden={!isContenuVisible}>
+        {contenu}
+      </div>
     </>
   );
 }
 
+let id: string;
 let texteTitre: string;
 let titreElement: JSX.Element;
 let texteContenu: string;
 let contenuElement: JSX.Element;
 
 beforeEach(() => {
+  id = "contenu-1";
+
   texteTitre = "Le titre";
   titreElement = <h2>{texteTitre}</h2>;
 
   texteContenu = "Le contenu";
   contenuElement = <p>{texteContenu}</p>;
 
-  render(<Accordion titre={titreElement} contenu={contenuElement} />);
+  render(<Accordion id={id} titre={titreElement} contenu={contenuElement} />);
 });
 
 test("Affiche le titre de l'item de l'accordéon", () => {
@@ -105,4 +113,16 @@ test("Le titre est accessible", () => {
 
   fireEvent.keyDown(conteneurTitre, { key: "32" });
   expect(contenu).not.toBeVisible();
+});
+
+test("Le lien titre / contenu est accessible", () => {
+  const conteneurTitre = screen.getByText(texteTitre)!.parentElement!;
+  const conteneurContenu = screen.getByText(texteContenu).parentElement!;
+
+  expect(conteneurTitre).toHaveAttribute("aria-expanded", "false");
+  fireEvent.click(conteneurTitre);
+  expect(conteneurTitre).toHaveAttribute("aria-expanded", "true");
+
+  expect(conteneurTitre).toHaveAttribute("aria-controls", id);
+  expect(conteneurContenu).toHaveAttribute("id", id);
 });
