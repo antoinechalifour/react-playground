@@ -1,6 +1,7 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { Accordion } from "./Accordion";
 
 function App() {
   return (
@@ -10,14 +11,12 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+
+        <Accordion
+          id="accordion-1"
+          titre={<h2>Démonstration accordion</h2>}
+          contenu={<p>Le contenu à afficher</p>}
+        />
       </header>
     </div>
   );

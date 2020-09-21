@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { render } from "@testing-library/react";
-import { screen, fireEvent } from "@testing-library/dom";
+import { fireEvent, screen } from "@testing-library/dom";
+import { Accordion } from "./Accordion";
 
 /**
  * Spécifications :
@@ -25,38 +26,6 @@ import { screen, fireEvent } from "@testing-library/dom";
  * - TODO: afficher le contenu du titre cliqué
  * - TODO: cacher le contenu du titre non sélectionné
  */
-
-interface AccordionProps {
-  id: string;
-  titre: JSX.Element;
-  contenu: JSX.Element;
-}
-
-function Accordion({ id, titre, contenu }: AccordionProps) {
-  const [isContenuVisible, setContenuVisible] = useState(false);
-  const onTitreClick = () => setContenuVisible(!isContenuVisible);
-  const onTitreKeyDown = (e: React.KeyboardEvent) => {
-    if (["13", "32"].includes(e.key)) onTitreClick();
-  };
-
-  return (
-    <>
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={onTitreClick}
-        onKeyDown={onTitreKeyDown}
-        aria-expanded={isContenuVisible}
-        aria-controls={id}
-      >
-        {titre}
-      </div>
-      <div id={id} hidden={!isContenuVisible}>
-        {contenu}
-      </div>
-    </>
-  );
-}
 
 let id: string;
 let texteTitre: string;
@@ -98,20 +67,22 @@ test("Le titre est accessible", () => {
   const conteneurTitre = screen.getByText(texteTitre)!.parentElement!;
   const contenu = screen.getByText("Le contenu");
 
+  conteneurTitre.focus();
+
   expect(conteneurTitre.tagName).toBe("DIV");
   expect(conteneurTitre).toHaveAttribute("role", "button");
   expect(conteneurTitre).toHaveAttribute("tabindex", "0");
 
-  fireEvent.keyDown(conteneurTitre, { key: "13" });
+  fireEvent.keyPress(conteneurTitre, { charCode: 13 });
   expect(contenu).toBeVisible();
 
-  fireEvent.keyDown(conteneurTitre, { key: "13" });
+  fireEvent.keyPress(conteneurTitre, { charCode: 13 });
   expect(contenu).not.toBeVisible();
 
-  fireEvent.keyDown(conteneurTitre, { key: "32" });
+  fireEvent.keyPress(conteneurTitre, { charCode: 32 });
   expect(contenu).toBeVisible();
 
-  fireEvent.keyDown(conteneurTitre, { key: "32" });
+  fireEvent.keyPress(conteneurTitre, { charCode: 32 });
   expect(contenu).not.toBeVisible();
 });
 
